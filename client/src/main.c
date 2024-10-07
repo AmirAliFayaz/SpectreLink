@@ -57,7 +57,7 @@ bool handle_packet(Packet *packet) {
 //            return false;
 //    }
 
-    return true;
+    return false;
 }
 
 

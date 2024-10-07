@@ -16,6 +16,6 @@ const (
 )
 
 const (
-	BigEndian ByteCode = iota
+	BigEndian ByteCode = iota + 1
 	LittleEndian
 )

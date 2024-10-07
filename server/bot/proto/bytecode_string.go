@@ -8,8 +8,8 @@ func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
-	_ = x[BigEndian-0]
-	_ = x[LittleEndian-1]
+	_ = x[BigEndian-1]
+	_ = x[LittleEndian-2]
 }
 
 const _ByteCode_name = "BigEndianLittleEndian"
@@ -17,8 +17,9 @@ const _ByteCode_name = "BigEndianLittleEndian"
 var _ByteCode_index = [...]uint8{0, 9, 21}
 
 func (i ByteCode) String() string {
+	i -= 1
 	if i >= ByteCode(len(_ByteCode_index)-1) {
-		return "ByteCode(" + strconv.FormatInt(int64(i), 10) + ")"
+		return "ByteCode(" + strconv.FormatInt(int64(i+1), 10) + ")"
 	}
 	return _ByteCode_name[_ByteCode_index[i]:_ByteCode_index[i+1]]
 }

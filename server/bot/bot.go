@@ -30,13 +30,13 @@ func (b *Bot) ReadHandshake() error {
 		return err
 	}
 	
-	code := proto.ByteCode(buffer[1])
+	b.ByteCode = proto.ByteCode(buffer[1])
 	
-	if buffer[0] != 0x0 || (code != proto.BigEndian && code != proto.LittleEndian) {
+	if buffer[0] != 0x0 || (b.ByteCode != proto.BigEndian && b.ByteCode != proto.LittleEndian) {
 		return ErrInvalidHandshake
 	}
 	
-	log.Infof("Handshake: %v", buffer)
-	b.ByteCode = code
+	log.Infof("Handshake: %v-%v", buffer, b.ByteCode)
+	
 	return nil
 }

@@ -1,4 +1,9 @@
+package main
 
+import "SpectreLink/admin"
 
-void main(){
+func main() {
+	spec := admin.NewSpectreLink()
+	spec.ListenAndServe()
+
 }

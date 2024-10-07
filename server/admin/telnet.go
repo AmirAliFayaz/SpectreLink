@@ -28,6 +28,7 @@ func (s *TelnetServer) HandleTelnet(conn *telnet.Connection) {
 	}
 
 	session.RegisterCommands()
+	go session.Handle()
 
 	for command, err := session.ReadCommand(); command != nil; command, err = session.ReadCommand() {
 		if err == nil {

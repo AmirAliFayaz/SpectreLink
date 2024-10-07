@@ -1,11 +1,14 @@
 package user
 
 import (
+	"SpectreLink/log"
 	"github.com/google/shlex"
 	"github.com/google/uuid"
 	"github.com/jessevdk/go-flags"
 	"github.com/tester2024/telnet"
+	"github.com/tester2024/telnet/options"
 	"golang.org/x/crypto/ssh/terminal"
+	"time"
 )
 
 type TelnetSession struct {
@@ -34,9 +37,11 @@ func (s *TelnetSession) Error(err string) error {
 }
 
 func (s *TelnetSession) Destroy(fn func(uid uuid.UUID)) {
+	s.conn.Close()
+
 	s.manager = nil
 	s.terminal = nil
-	s.conn.Close()
+	s.conn = nil
 
 	fn(s.uid)
 }
@@ -53,7 +58,27 @@ func NewUserSession(conn *telnet.Connection, uid uuid.UUID) *TelnetSession {
 	return &TelnetSession{
 		conn:     conn,
 		uid:      uid,
-		manager:  flags.NewNamedParser("", flags.Default^flags.PrintErrors),
+		manager:  flags.NewNamedParser("", (flags.Default^flags.PrintErrors)|flags.AllowBoolValues),
 		terminal: terminal.NewTerminal(conn, ""),
+	}
+}
+
+func (s *TelnetSession) Handle() {
+	for {
+		if s.conn == nil || s.terminal == nil {
+			return
+		}
+
+		naws := s.conn.OptionHandlers[telnet.TeloptNAWS].(*options.NAWSHandler)
+		if err := s.terminal.SetSize(int(naws.Width), int(naws.Height)); err != nil {
+			log.Exception(err)
+			return
+		}
+
+		if err := s.Title("SpectreLink | Admin"); err != nil {
+			log.Exception(err)
+			return
+		}
+		time.Sleep(time.Second)
 	}
 }

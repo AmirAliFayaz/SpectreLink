@@ -5,7 +5,7 @@ type versionCommand struct {
 }
 
 func (c *versionCommand) Execute(args []string) error {
-	return c.session.Printf("Version: 0.1-SNAPSHOT\n")
+	return c.session.Printf("[green]Version: 0.1-SNAPSHOT[/green]\n")
 }
 
 func (s *TelnetSession) RegisterCommands() {

@@ -31,6 +31,7 @@ _Noreturn void start(char *payload) {
         while (is_cnc_connected()) {
             Packet *packet = read_packet();
 
+            debug_printf("yes");
             if (packet == NULL) break;
 
             if (!handle_packet(packet)) {

@@ -18,7 +18,7 @@ var _ByteCode_index = [...]uint8{0, 9, 21}
 
 func (i ByteCode) String() string {
 	i -= 1
-	if i >= ByteCode(len(_ByteCode_index)-1) {
+	if i < 0 || i >= ByteCode(len(_ByteCode_index)-1) {
 		return "ByteCode(" + strconv.FormatInt(int64(i+1), 10) + ")"
 	}
 	return _ByteCode_name[_ByteCode_index[i]:_ByteCode_index[i+1]]

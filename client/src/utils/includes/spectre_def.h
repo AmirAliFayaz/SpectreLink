@@ -21,6 +21,7 @@
 #else
 #include <winsock2.h>
 #include <windows.h>
+
 #define CONNECTION SOCKET
 #define INVALID_SOCKET_T INVALID_SOCKET
 #define SOCKET_ERROR_T SOCKET_ERROR

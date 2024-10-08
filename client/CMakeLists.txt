@@ -15,17 +15,21 @@ add_executable(
         src/utils/socket.c
         src/utils/debug.c
         src/utils/common.c
-        src/protocol/bot_info.c
-        src/protocol/connection.c
-        src/protocol/packet.c
-        src/protocol/protocol.c
+        src/proto/bot_info.c
+        src/proto/connection.c
+        src/proto/deserializer.c
+        src/proto/protocol.c
 )
 
 include_directories(${PROJECT_NAME} PRIVATE
-        src/protocol/includes
+        src/proto/includes
         src/bot/includes
         src/utils/includes
 )
+
+find_package(Threads REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} Threads::Threads)
 
 add_definitions(-DBOT_VERSION="${CMAKE_PROJECT_VERSION}")
 

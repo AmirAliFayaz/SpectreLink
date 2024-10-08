@@ -53,6 +53,12 @@ bool write_packet(Packet packet) {
         }
 
         switch (packet.data[i].type) {
+            case ArgTypeInt16:
+                if (!write_int16(conn, *(int16_t *) packet.data[i].value)) {
+                    debug_printf("write_packet: write_int16 failed");
+                    break;
+                }
+                break;
             case ArgTypeInt32:
                 if (!write_int32(conn, *(int32_t *) packet.data[i].value)) {
                     debug_printf("write_packet: write_int32 failed");
@@ -81,6 +87,11 @@ bool write_packet(Packet packet) {
                     debug_printf("write_packet: write_float failed");
                 }
                 break;
+            case ArgTypeDouble:
+                if (!write_double(conn, *(double *) packet.data[i].value)) {
+                    debug_printf("write_packet: write_dobule failed");
+                }
+                break;
             case ArgTypeBotInfo:
                 if (!write_bot_info(conn, (SpectreInfo *) packet.data[i].value)) {
                     debug_printf("write_packet: write_bot_info failed");
@@ -103,26 +114,22 @@ Packet *read_packet() {
         return NULL;
     }
 
-    pthread_mutex_lock(conn->mx);
 
     int type;
     if (!read_int32(conn, &type)) {
         debug_printf("read_packet: read_int32 failed");
-        pthread_mutex_unlock(conn->mx);
         return NULL;
     }
 
     int count;
     if (!read_int32(conn, &count)) {
         debug_printf("read_packet: read_int32 failed");
-        pthread_mutex_unlock(conn->mx);
         return NULL;
     }
 
     Packet *packet = create_packet(type);
     if (packet == NULL) {
         debug_printf("read_packet: create_packet failed");
-        pthread_mutex_unlock(conn->mx);
         return NULL;
     }
 
@@ -133,7 +140,6 @@ Packet *read_packet() {
     if (packet->data == NULL) {
         debug_printf("read_packet: malloc failed");
         free(packet);
-        pthread_mutex_unlock(conn->mx);
         return NULL;
     }
 
@@ -157,6 +163,12 @@ Packet *read_packet() {
         debug_printf("read_packet: type: %d, key: %s", packet->data[i].type, packet->data[i].key);
 
         switch (packet->data[i].type) {
+            case ArgTypeInt16:
+                if (!read_int16(conn, (int16_t *) &packet->data[i].value)) {
+                    debug_printf("read_packet: read_int16 failed");
+                    goto cleanup;
+                }
+                break;
             case ArgTypeInt32:
                 if (!read_int32(conn, (int32_t *) &packet->data[i].value)) {
                     debug_printf("read_packet: read_int32 failed");
@@ -184,6 +196,12 @@ Packet *read_packet() {
             case ArgTypeFloat:
                 if (!read_float(conn, (float *) &packet->data[i].value)) {
                     debug_printf("read_packet: read_float failed");
+                    goto cleanup;
+                }
+                break;
+            case ArgTypeDouble:
+                if (!read_double(conn, (double *) &packet->data[i].value)) {
+                    debug_printf("read_packet: read_double failed");
                     goto cleanup;
                 }
                 break;
@@ -255,11 +273,9 @@ Packet *read_packet() {
         }
     }
 
-    pthread_mutex_unlock(conn->mx);
     return packet;
 
     cleanup:
-    pthread_mutex_unlock(conn->mx);
     free_packet(packet);
     return NULL;
 }
@@ -313,6 +329,9 @@ void debug_packet(Packet *packet) {
         }
 
         switch (packet->data[i].type) {
+            case ArgTypeInt16:
+                printf(" - %d", *(int16_t *) packet->data[i].value);
+                break;
             case ArgTypeInt32:
                 printf(" - %d", *(int32_t *) packet->data[i].value);
                 break;
@@ -331,6 +350,9 @@ void debug_packet(Packet *packet) {
                 break;
             case ArgTypeFloat:
                 printf(" - %f", *(float *) packet->data[i].value);
+                break;
+            case ArgTypeDouble:
+                printf(" - %f", *(double *) packet->data[i].value);
                 break;
             case ArgTypeIP:
                 printf(" - %p", packet->data[i].value);

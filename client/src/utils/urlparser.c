@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <strings.h>
 #include <common.h>
+#include <strings.h>
 
 char *read_until(char **ptr, char end);
 

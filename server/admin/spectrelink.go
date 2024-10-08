@@ -9,19 +9,19 @@ import (
 
 type SpectreLink struct {
 	bots   *sync.Map
-	telnet *telnet.TelnetServer
+	telnet *telnet.Server
 	server *bot.Server
 }
 
 func (l *SpectreLink) ListenAndServe() {
 	wg := new(sync.WaitGroup)
 	wg.Add(2)
-	
+
 	go l.telnet.ListenAndServe(wg)
 	go l.server.ListenAndServe(wg)
-	
+
 	log.Infof("Listening on %s", l.telnet.ListenAddr())
-	
+
 	wg.Wait()
 }
 

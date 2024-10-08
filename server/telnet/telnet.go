@@ -12,29 +12,36 @@ import (
 	"sync"
 )
 
-type TelnetServer struct {
+type Server struct {
 	sessions *sync.Map
 	server   *telnet.Server
 }
 
-func (s *TelnetServer) HandleTelnet(conn *telnet.Connection) {
+func (s *Server) HandleTelnet(conn *telnet.Connection) {
 	session := s.createSession(conn)
 	defer session.Destroy(s.deleteSession)
-	
+
 	if !session.DoAuthenticate() {
 		session.Error("Failed to authenticate")
 		session.ReadKey()
 		return
 	}
-	
+
+	session.UpdateSize()
+
+	if err := session.SendBanner(); err != nil {
+		return
+	}
+
 	session.RegisterCommands()
+
 	go session.Handle()
-	
+
 	for command, err := session.ReadCommand(); command != nil; command, err = session.ReadCommand() {
 		if err == nil {
 			continue
 		}
-		
+
 		var flagsErr *flags.Error
 		switch {
 		case errors.As(err, &flagsErr):
@@ -56,43 +63,43 @@ func (s *TelnetServer) HandleTelnet(conn *telnet.Connection) {
 			log.Exception(err, "Failed to read command")
 		}
 	}
-	
+
 }
 
-func (s *TelnetServer) ListenAndServe(wg *sync.WaitGroup) {
+func (s *Server) ListenAndServe(wg *sync.WaitGroup) {
 	defer wg.Done()
-	
+
 	if err := s.server.ListenAndServe(); err != nil {
 		panic(err)
 	}
 }
 
-func (s *TelnetServer) createSession(conn *telnet.Connection) *user.TelnetSession {
+func (s *Server) createSession(conn *telnet.Connection) *user.TelnetSession {
 	uid, err := uuid.NewRandom()
 	if err != nil {
 		panic(err)
 	}
-	
+
 	sess := user.NewUserSession(conn, uid)
-	
+
 	s.sessions.Store(uid, sess)
-	
+
 	return sess
 }
 
-func (s *TelnetServer) deleteSession(uid uuid.UUID) {
+func (s *Server) deleteSession(uid uuid.UUID) {
 	s.sessions.Delete(uid)
 }
 
-func (s *TelnetServer) ListenAddr() any {
+func (s *Server) ListenAddr() any {
 	return s.server.Address
 }
 
-func NewTelnetServer() *TelnetServer {
-	t := &TelnetServer{
+func NewTelnetServer() *Server {
+	t := &Server{
 		sessions: new(sync.Map),
 	}
-	
+
 	t.server = telnet.NewServer(
 		":1337",
 		t,

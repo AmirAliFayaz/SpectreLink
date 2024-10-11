@@ -95,3 +95,45 @@
 
 ## Conclusion
 Creating a CNC and botnet involves careful design and implementation to ensure effective communication, command execution, and data collection while maintaining security and stealth. It is essential to understand and adhere to legal and ethical considerations, as operating a botnet for malicious purposes is illegal and unethical. This overview provides a foundational approach to understanding the architecture and components involved in CNC systems.
+
+## Methods 
+```graphql
+// UDP (Layer 4)
+UDP-PPS               # Performance optimized for maximum packets per second (PPS)
+UDP-STORM             # Performance optimized for undetectable flooding
+UDP-POWER             # Performance optimized for high bandwidth
+UDP-OVH               # Performance optimized for bypassing OVH protection
+
+// TCP (Layer 4)
+TCP-SYN               # Sends TCP raw packets with the SYN flag
+TCP-ACK               # Sends TCP raw packets with the ACK flag
+TCP-MASS              # Sends TCP raw packets with all flags set (also known as XMAS)
+TCP-RF                # Sends TCP raw packets with random flags and data
+TCP-SOCKET            # Creates normal TCP connections with high connection spam
+TCP-HALT              # Creates normal TCP connections but interrupts after connection
+TCP-DROP              # Sends TCP raw packets with random choices of RST or FIN flags
+TCP-TFO               # Sends TCP raw packets with the SYN+ACK flags
+
+// Layer 3
+ESP                   # Sends raw packets with ESP (Encapsulating Security Payload) headers
+GRE                   # Sends raw packets with GRE (Generic Routing Encapsulation) headers
+IGMP                  # Sends raw packets with IGMP (Internet Group Management Protocol) headers
+ICMP                  # Sends raw packets with ICMP (Internet Control Message Protocol) headers
+
+// Game
+TCP-MC                # Creates a TCP connection with a Minecraft Status Ping payload
+UDP-FIVEM             # Sends UDP packets with a FiveM status ping payload
+UDP-TS3               # Sends UDP packets with a TeamSpeak 3 handshake payload
+UDP-VSE               # Sends UDP packets with a Valve Source Engine query payload
+UDP-RakNet            # Sends UDP packets with a RakNet payload
+UDP-SAMP              # Sends UDP packets with a SAMP (San Andreas Multiplayer) payload
+
+// HTTP (Layer 7)
+HTTP-FLOOD            # Raw HTTP request flood optimized for performance and PPS
+HTTP-BYPASS           # HTTP flood optimized for evading detection
+HTTP-SLOW             # HTTP Slowloris attack
+HTTP-SMART            # HTTP flood designed to follow cookies, paths, and fingerprints to evade detection
+HTTP-LOAD             # HTTP-BYPASS with high data load to exhaust target memory
+HTTP-EXPLOIT          # HTTP flood using well-known DoS exploits to ensure target failure
+HTTP-BOT              # Floods the target like a search engine bot, spamming requests
+```

@@ -1,7 +1,9 @@
 package proto
 
 import (
+	"SpectreLink/log"
 	"bufio"
+	"errors"
 	"net"
 	"time"
 )
@@ -68,6 +70,12 @@ func (c *Connection) ReadPacket() *Packet {
 	return pkt
 }
 func (c *Connection) WritePacket(pkt *Packet) error {
+	if err := c.SetWriteDeadline(time.Second * 60); err != nil {
+		return err
+	}
+
+	log.Infof("Packet: %v", pkt)
+
 	if err := writeInt32(c, int32(pkt.Type)); err != nil {
 		return err
 	}
@@ -89,9 +97,23 @@ func (c *Connection) WritePacket(pkt *Packet) error {
 			return err
 		}
 	}
-	return nil
+
+	return c.Flush()
 }
 
 func (c *Connection) Close() error {
 	return c.conn.Close()
+}
+
+func (c *Connection) Send(bytes []byte) error {
+	n, err := c.Write(bytes)
+	if err != nil {
+		return err
+	}
+
+	if n != len(bytes) {
+		return errors.New("failed to send all bytes")
+	}
+
+	return c.Flush()
 }

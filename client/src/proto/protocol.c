@@ -69,17 +69,18 @@ bool read_string(cnc_conn *c, char **val) {
         return false;
     }
 
-    if (len <= 0) return true;
-
     *val = malloc(len + 1);
+
     if (*val == NULL) return false;
+
+    (*val)[len] = '\0';
+    if (len <= 0) return true;
 
     if (READ_SOCKET(c->sock, *val, len) != (size_t) len) {
         free(*val);
         return false;
     }
 
-    (*val)[len] = '\0';
     return true;
 }
 
@@ -89,9 +90,11 @@ Map *read_string_map(cnc_conn *c) {
         return NULL;
     }
 
+    printf("count: %d\n", count);
+
     Map *map = malloc(sizeof(Map));
     map->count = count;
-    map->body = malloc(sizeof(MapEntry *) * count);
+    map->body = malloc(sizeof(MapEntry *) * count + 1);
 
     for (int i = 0; i < count; i++) {
         if (!read_string(c, &map->body[i].key)) {
@@ -100,11 +103,14 @@ Map *read_string_map(cnc_conn *c) {
             return NULL;
         }
 
+        printf("key: %s\n", map->body[i].key);
+
         if (!read_string(c, &map->body[i].value)) {
             free(map->body);
             free(map);
             return NULL;
         }
+
     }
 
     return map;

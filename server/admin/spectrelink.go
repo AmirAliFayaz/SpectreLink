@@ -26,9 +26,10 @@ func (l *SpectreLink) ListenAndServe() {
 }
 
 func NewSpectreLink() *SpectreLink {
+	server := bot.NewServer()
 	return &SpectreLink{
-		server: bot.NewServer(),
-		telnet: telnet.NewTelnetServer(),
+		server: server,
+		telnet: telnet.NewTelnetServer(server),
 		bots:   new(sync.Map),
 	}
 }

